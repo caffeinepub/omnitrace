@@ -1,0 +1,87 @@
+{
+  "kind": "build_request",
+  "title": "Retry build + promote Version 8 to live with build-info verification",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-64",
+      "text": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase, since the previous attempt failed due to an internal build/deployment error.",
+      "target": "unknown",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-3",
+          "msg-4",
+          "msg-5",
+          "msg-6"
+        ],
+        "quotes": [
+          "🙏 Unable to complete deployment",
+          "Deployment error",
+          "❗ Internal AI error encountered. Sorry about that!",
+          "Looks like the build ran into an internal error — want me to try running it again now?",
+          "Yeah"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A fresh build/deploy completes successfully without internal build system errors.",
+        "The live (production) URL serves the newly built frontend assets (not a stale/cached version)."
+      ]
+    },
+    {
+      "id": "REQ-65",
+      "text": "After deployment, verify that Settings → Build Info reports matching build versions for frontend and backend as \"Version 8\", and that no version-mismatch warning is shown when the versions match.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-6"
+        ],
+        "quotes": [
+          "🙏 Unable to complete deployment",
+          "Yeah"
+        ]
+      },
+      "acceptanceCriteria": [
+        "In the live app, Settings → Build Info shows Frontend version: \"Version 8\" (from frontend/src/constants/buildInfo.ts).",
+        "In the live app, Settings → Build Info shows Backend version: \"Version 8\" (from backend getBuildInfo()).",
+        "When backend version equals frontend version, the mismatch warning does not appear.",
+        "If the backend build info cannot be loaded, the UI continues to show \"Error loading\" for backend version (existing behavior), and no mismatch warning is shown solely due to that error state."
+      ]
+    },
+    {
+      "id": "REQ-66",
+      "text": "Confirm the backend build-info endpoint is deployed and returns the expected Version 8 build info (version and backendTimestamp) on the live backend canister.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-6"
+        ],
+        "quotes": [
+          "🙏 Unable to complete deployment",
+          "Yeah"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Calling backend getBuildInfo() on the live deployment returns version = \"Version 8\".",
+        "Calling backend getBuildInfo() on the live deployment returns a non-empty backendTimestamp string.",
+        "The frontend Settings → Build Info screen can successfully fetch and display the backend build info in the live environment."
+      ]
+    }
+  ],
+  "constraints": [
+    "Respect the single-actor backend architecture (all Motoko logic remains in backend/main.mo).",
+    "Do not edit files in frontend immutablePaths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Do not add new application features unrelated to retrying the failed build/deployment.",
+    "Do not change the OMNITRACE data model, analytics logic, or UI theme as part of this retry unless required to resolve the build/deploy failure.",
+    "Do not introduce new external services or dependencies."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

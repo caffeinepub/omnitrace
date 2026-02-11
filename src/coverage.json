@@ -1,0 +1,64 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-11T13:27:37.660Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 2,
+    "items": [
+      {
+        "id": "REQ-64",
+        "summary": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase, since the previous attempt failed due to an internal build/deployment error.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/PRODUCTION_PROMOTION.md",
+          "frontend/src/screens/SettingsScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/PRODUCTION_PROMOTION.md",
+          "frontend/src/screens/SettingsScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-65",
+        "summary": "After deployment, verify that Settings → Build Info reports matching build versions for frontend and backend as \"Version 8\", and that no version-mismatch warning is shown when the versions match.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/SettingsScreen.tsx",
+          "frontend/src/hooks/useBuildInfo.ts",
+          "frontend/src/constants/buildInfo.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/SettingsScreen.tsx",
+          "frontend/src/hooks/useBuildInfo.ts",
+          "frontend/src/constants/buildInfo.ts"
+        ]
+      },
+      {
+        "id": "REQ-66",
+        "summary": "Confirm the backend build-info endpoint is deployed and returns the expected Version 8 build info (version and backendTimestamp) on the live backend canister.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/PRODUCTION_PROMOTION.md",
+    "frontend/src/constants/buildInfo.ts",
+    "frontend/src/hooks/useBuildInfo.ts",
+    "frontend/src/screens/SettingsScreen.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

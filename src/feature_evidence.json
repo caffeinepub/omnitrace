@@ -1,0 +1,48 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-re-run-a-clean-build-and-deployment-promotion-to-the-live-production-environment-for-the-existing-version-8-codebase-since-the-previous-attempt-failed-due-to-an-internal-build-deployment-error",
+      "featureTitle": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase, since the previous attempt failed due to an internal build/deployment error.",
+      "files": [
+        "frontend/PRODUCTION_PROMOTION.md",
+        "frontend/src/screens/SettingsScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-64"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-after-deployment-verify-that-settings-build-info-reports-matching-build-versions-for-frontend-and-backend-as-version-8-and-that-no-version-mismatch-warning-is-shown-when-the-versions-match",
+      "featureTitle": "After deployment, verify that Settings → Build Info reports matching build versions for frontend and backend as \"Version 8\", and that no version-mismatch warning is shown when the versions match.",
+      "files": [
+        "frontend/src/constants/buildInfo.ts",
+        "frontend/src/hooks/useBuildInfo.ts",
+        "frontend/src/screens/SettingsScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-65"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

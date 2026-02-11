@@ -1,0 +1,769 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 25,
+  "summary": "OMNITRACE: a single-file, offline-first, full-stack personal activity intelligence system (personal black box) that records and visualizes all meaningful in-app and allowable device-context interactions as a precise, searchable time-based timeline, with deterministic analytics, premium minimal UI, and strict local-privacy controls.",
+  "architectural_notes": [
+    "Hard constraint: must be a full-stack app contained in a single file (UI + logic + storage), offline-first, with no runtime external dependencies; WebView compatible and wrapper-ready.",
+    "Core paradigm: time-driven system; timeline accuracy is primary and UI is secondary.",
+    "Data model is time-series oriented: event logs + sessions + duration aggregates + metadata + annotations, indexed by time, with zero data-loss tolerance.",
+    "Analytics must be deterministic (no AI) and derived purely from recorded logs.",
+    "Privacy-first: local-only storage, no tracking SDKs/analytics, no cloud sync by default; provide wipe + export controls.",
+    "Stopwatch/Timer should live in a distinct UI section/screen (not embedded into the Live Timeline), per user request.",
+    "UI direction update: adopt “Neural Midnight” theme tokens (bg #0B0F1A; surfaces #11162A/#161C35; accents #6C7BFF and #2EE6D6) with sharp, minimal, data-centric typography.",
+    "Add “Cognitive Time Flow” visual encoding in the timeline: focus intensity/mental state communicated through subtle color shifts, soft glows, elevation depth, and micro-animations; auto events look structured/precise, manual entries more organic (purely visual—no AI analytics implied).",
+    "New user-requested “AI-like” cognition features (focus score, drift detection, daily summary) must remain privacy-first and implementable deterministically from recorded logs (heuristics), aligning with the no-AI analytics constraint.",
+    "Release/publish control: do not auto-promote drafts to live; user will publish live manually."
+  ],
+  "known_issues": [
+    "App fails to open and appears stuck on an “initializing app” state/screen.",
+    "User reports Version 6 is not going live / not visible as live build (potential deployment/publish or URL/cache issue).",
+    "Build/deploy attempt failed due to an internal error during the build process (deployment not completed)."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-create-the-omnitrace-core-data-model-and-local-persistence-layer-for-time-indexed-activity-logs-including-event-logs-ms-precision-session-records-duration-aggregates-metadata-and-user-annotations-ensure-data-is-stored-locally-by-default-with-zero-data-loss-safeguards-atomic-writes-crash-safe-append-commit-strategy-schema-versioning",
+      "title": "Create the OMNITRACE core data model and local persistence layer for time-indexed activity logs, including: event logs (ms-precision), session records, duration aggregates, metadata, and user annotations; ensure data is stored locally by default with zero-data-loss safeguards (atomic writes, crash-safe append/commit strategy, schema versioning).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-time-engine-that-maintains-global-clock-reference-per-session-clock-idle-vs-active-interaction-detection-activity-duration-tracking-overlap-resolution-rules-and-query-helpers-that-can-answer-what-was-i-doing-at-time-x-using-only-recorded-events-no-assumptions",
+      "title": "Implement a time engine that maintains global clock reference, per-session clock, idle vs active interaction detection, activity duration tracking, overlap resolution rules, and query helpers that can answer “What was I doing at time X?” using only recorded events (no assumptions).",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-automatic-in-app-interaction-instrumentation-so-that-every-meaningful-user-action-inside-omnitrace-produces-an-event-log-entry-navigation-screen-changes-button-clicks-mode-changes-form-edits-create-update-delete-operations-settings-changes-with-captured-context-current-screen-mode-state-snapshot",
+      "title": "Add automatic in-app interaction instrumentation so that every meaningful user action inside OMNITRACE produces an event log entry (navigation/screen changes, button clicks, mode changes, form edits, create/update/delete operations, settings changes), with captured context (current screen/mode/state snapshot).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-device-context-session-tracking-within-web-constraints-app-foreground-background-transitions-session-boundaries-active-interaction-time-vs-idle-time-while-app-is-active-and-screen-on-off-equivalent-signals-available-to-a-webview-visibility-focus-events-producing-a-coherent-session-timeline",
+      "title": "Implement device-context/session tracking within web constraints: app foreground/background transitions, session boundaries, active interaction time vs idle time while app is active, and “screen on/off”-equivalent signals available to a WebView (visibility/focus events), producing a coherent session timeline.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-manual-event-capture-so-users-can-log-timestamped-life-events-e-g-started-studying-phone-distraction-work-break-important-moment-with-category-optional-duration-keywords-and-notes-integrate-these-into-the-same-permanent-timeline-with-manual-confidence",
+      "title": "Add Manual Event Capture so users can log timestamped life events (e.g., Started studying, Phone distraction, Work break, Important moment) with category, optional duration, keywords, and notes; integrate these into the same permanent timeline with “manual” confidence.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-mandatory-live-timeline-view-as-the-primary-screen-a-vertically-scrollable-time-ledger-that-supports-smooth-scrolling-over-large-datasets-and-shows-timestamp-activity-name-duration-category-and-confidence-auto-vs-manual-with-quick-filters-by-category-confidence-and-a-day-time-jump-control",
+      "title": "Build the mandatory Live Timeline View as the primary screen: a vertically scrollable time ledger that supports smooth scrolling over large datasets and shows timestamp, activity name, duration, category, and confidence (auto vs manual), with quick filters (by category/confidence) and a day/time jump control.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-the-session-analysis-dashboard-screen-that-computes-and-visualizes-deterministic-metrics-total-active-time-passive-background-time-idle-gaps-context-switches-and-focus-density-for-a-selected-day-range",
+      "title": "Create the Session Analysis Dashboard screen that computes and visualizes deterministic metrics: total active time, passive/background time, idle gaps, context switches, and focus density for a selected day/range.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-the-activity-map-screen-that-breaks-down-time-by-category-study-work-distraction-rest-unknown-using-subtle-consistent-color-coding-and-shows-totals-and-percentages-for-a-selected-day-range",
+      "title": "Create the Activity Map screen that breaks down time by category (Study, Work, Distraction, Rest, Unknown) using subtle, consistent color coding and shows totals and percentages for a selected day/range.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-forensic-mode-user-selects-a-date-and-time-range-the-system-reconstructs-an-exact-ordered-timeline-of-what-happened-in-that-window-raw-events-derived-segments-explicitly-marking-any-recovered-ambiguous-areas-without-inventing-data",
+      "title": "Implement Forensic Mode: user selects a date and time range; the system reconstructs an exact, ordered timeline of what happened in that window (raw events + derived segments), explicitly marking any recovered/ambiguous areas without inventing data.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-an-advanced-search-query-system-that-supports-searching-filtering-by-activity-name-keyword-category-time-day-duration-thresholds-confidence-auto-manual-and-anomalies-e-g-long-idle-unusually-long-distraction-returning-results-instantly-for-large-datasets",
+      "title": "Build an advanced Search & Query system that supports searching/filtering by activity name, keyword, category, time/day, duration thresholds, confidence (auto/manual), and anomalies (e.g., long idle, unusually long distraction), returning results instantly for large datasets.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-deterministic-activity-intelligence-layer-no-ai-that-derives-insights-from-logs-including-most-frequent-activities-longest-uninterrupted-focus-most-common-interruption-sources-time-leakage-zones-peak-productivity-hours-and-habitual-patterns-display-these-insights-in-the-dashboard-or-a-dedicated-insights-section-within-it-with-transparent-definitions",
+      "title": "Implement a deterministic Activity Intelligence layer (no AI) that derives insights from logs, including: most frequent activities, longest uninterrupted focus, most common interruption sources, time leakage zones, peak productivity hours, and habitual patterns; display these insights in the Dashboard (or a dedicated Insights section within it) with transparent definitions.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-privacy-control-features-no-analytics-sdks-local-only-by-default-one-tap-full-wipe-with-confirmation-and-optional-export-of-all-data-as-json-and-csv",
+      "title": "Add Privacy & Control features: no analytics/SDKs, local-only by default, one-tap full wipe (with confirmation), and optional export of all data as JSON and CSV.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-a-minimal-backend-single-motoko-actor-that-supports-optional-user-initiated-backup-restore-of-exported-data-blobs-json-while-remaining-disabled-by-default-when-unused-the-app-must-function-fully-offline-with-local-only-storage",
+      "title": "Provide a minimal backend (single Motoko actor) that supports optional user-initiated backup/restore of exported data blobs (JSON) while remaining disabled by default; when unused, the app must function fully offline with local-only storage.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-engineer-performance-and-resilience-for-long-running-usage-handle-months-of-logs-keep-timeline-scrolling-and-search-responsive-implement-graceful-degradation-for-low-end-devices-and-cover-edge-cases-including-app-killed-mid-session-sudden-inactivity-overlapping-events-and-partial-recovery-on-next-launch",
+      "title": "Engineer performance and resilience for long-running usage: handle months of logs, keep timeline scrolling and search responsive, implement graceful degradation for low-end devices, and cover edge cases including app killed mid-session, sudden inactivity, overlapping events, and partial recovery on next launch.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-consistent-premium-dark-luxury-visual-theme-across-all-screens-minimal-text-strong-visual-hierarchy-calm-and-serious-feel-subtle-separators-and-restrained-accent-color-avoid-playful-gamified-styling",
+      "title": "Apply a consistent premium ‘dark luxury’ visual theme across all screens: minimal text, strong visual hierarchy, calm and serious feel, subtle separators, and restrained accent color (avoid playful/gamified styling).",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refresh-omnitrace-theme-and-color-palette-by-updating-the-app-s-design-tokens-css-variables-so-the-overall-ui-has-a-clearly-improved-cohesive-look-across-all-existing-screens-timeline-dashboard-activity-map-forensic-search-settings",
+      "title": "Refresh OMNITRACE theme and color palette by updating the app’s design tokens (CSS variables) so the overall UI has a clearly improved, cohesive look across all existing screens (Timeline, Dashboard, Activity Map, Forensic, Search, Settings).",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-dedicated-app-section-screen-for-stopwatch-and-timer-tools-accessible-from-the-main-navigation-alongside-the-existing-sections",
+      "title": "Add a new dedicated app section/screen for Stopwatch and Timer tools, accessible from the main navigation alongside the existing sections.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-functional-stopwatch-and-timer-ui-within-the-new-section-with-clear-controls-and-status-display-using-english-user-facing-text",
+      "title": "Implement functional Stopwatch and Timer UI within the new section, with clear controls and status display, using English user-facing text.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refine-the-global-omnitrace-visual-system-to-feel-more-premium-and-cohesive-while-keeping-the-existing-dark-luxury-direction-adjust-design-token-css-variables-colors-border-input-contrast-card-layering-radii-and-ensure-consistent-typography-hierarchy-across-all-screens",
+      "title": "Refine the global OMNITRACE visual system to feel more premium and cohesive while keeping the existing dark-luxury direction: adjust design-token CSS variables (colors, border/input contrast, card layering, radii) and ensure consistent typography hierarchy across all screens.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-upgrade-the-appshell-header-navigation-to-improve-perceived-quality-and-usability-tighten-spacing-improve-active-state-affordance-and-ensure-the-tab-bar-remains-usable-on-small-screens-no-clipped-tabs",
+      "title": "Upgrade the AppShell header + navigation to improve perceived quality and usability: tighten spacing, improve active-state affordance, and ensure the tab bar remains usable on small screens (no clipped tabs).",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-polish-the-live-timeline-ui-for-readability-and-density-improve-event-row-layout-timestamp-title-badges-duration-reduce-visual-noise-and-make-empty-states-and-counts-feel-consistent-with-the-premium-theme",
+      "title": "Polish the Live Timeline UI for readability and density: improve event row layout (timestamp, title, badges, duration), reduce visual noise, and make empty states and counts feel consistent with the premium theme.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-polish-dashboard-and-activity-map-visual-components-to-match-the-upgraded-theme-improve-card-hierarchy-metric-readability-and-progress-bar-styling-consistency-without-changing-the-underlying-computed-metrics",
+      "title": "Polish Dashboard and Activity Map visual components to match the upgraded theme: improve card hierarchy, metric readability, and progress-bar styling consistency without changing the underlying computed metrics.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-standardize-ui-states-across-screens-loading-empty-disabled-using-existing-shadcn-components-and-tailwind-utilities-so-the-app-feels-consistent-and-intentional",
+      "title": "Standardize UI states across screens (loading, empty, disabled) using existing shadcn components and Tailwind utilities so the app feels consistent and intentional.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-startup-initialization-flow-so-the-app-cannot-get-stuck-indefinitely-on-the-initializing-omnitrace-loading-state-when-startup-throws-e-g-indexeddb-not-initialized-or-indexeddb-errors",
+      "title": "Fix the startup initialization flow so the app cannot get stuck indefinitely on the “Initializing OMNITRACE...” loading state when startup throws (e.g., IndexedDB not initialized or IndexedDB errors).",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-initialize-the-local-indexeddb-storage-before-any-storage-reads-writes-during-startup-including-recovery-and-session-start-so-calls-like-getlastsession-addsession-addevent-cannot-throw-database-not-initialized-during-app-boot",
+      "title": "Initialize the local IndexedDB storage before any storage reads/writes during startup (including recovery and session start) so calls like getLastSession/addSession/addEvent cannot throw “Database not initialized” during app boot.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-startup-failed-ui-state-with-clear-actions-when-initialization-fails-display-an-error-message-in-english-and-provide-at-least-a-retry-action-to-rerun-initialization-also-provide-a-safe-wipe-local-data-action-to-recover-from-corrupted-indexeddb-states",
+      "title": "Add a dedicated “startup failed” UI state with clear actions when initialization fails: display an error message in English and provide at least a “Retry” action to rerun initialization; also provide a safe “Wipe local data” action to recover from corrupted IndexedDB states.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-new-neural-midnight-dark-mode-theme-across-the-omnitrace-frontend-using-the-provided-palette-deep-neural-black-background-0b0f1a-layered-surfaces-11162a-and-161c35-electric-indigo-accent-6c7bff-and-cyan-pulse-accent-2ee6d6-update-the-global-design-tokens-css-variables-so-all-screens-inherit-the-new-colors-contrast-borders-inputs-and-ring-focus-styles-consistently",
+      "title": "Implement a new “Neural Midnight” dark-mode theme across the OMNITRACE frontend using the provided palette: deep neural-black background #0B0F1A, layered surfaces #11162A and #161C35, Electric Indigo accent #6C7BFF, and Cyan Pulse accent #2EE6D6. Update the global design tokens (CSS variables) so all screens inherit the new colors, contrast, borders, inputs, and ring/focus styles consistently.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-cognitive-time-flow-visual-system-in-the-live-timeline-so-timeline-entries-communicate-focus-intensity-and-mental-state-using-subtle-color-shifts-soft-glows-elevation-depth-and-micro-animations-the-visual-treatment-must-be-data-driven-using-existing-event-fields-e-g-confidence-auto-manual-category-duration-and-must-not-invent-new-data",
+      "title": "Implement the “Cognitive Time Flow” visual system in the Live Timeline so timeline entries communicate focus intensity and mental state using subtle color shifts, soft glows, elevation depth, and micro-animations. The visual treatment must be data-driven using existing event fields (e.g., confidence auto/manual, category, duration) and must not invent new data.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-differentiate-timeline-card-styling-for-auto-logged-vs-manual-entries-auto-logged-events-must-appear-more-structured-and-precise-manual-entries-must-feel-more-organic-this-differentiation-must-be-achieved-via-shape-border-treatment-spacing-and-subtle-motion-glow-differences-while-keeping-readability-high-and-the-layout-consistent",
+      "title": "Differentiate timeline card styling for auto-logged vs manual entries: auto-logged events must appear more structured and precise; manual entries must feel more organic. This differentiation must be achieved via shape, border treatment, spacing, and subtle motion/glow differences while keeping readability high and the layout consistent.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-upgrade-typography-to-match-the-sharp-minimal-data-centric-direction-with-high-contrast-ensure-consistent-heading-hierarchy-improve-numeric-time-readability-e-g-timestamps-durations-and-apply-a-deliberate-mono-treatment-where-appropriate-timestamps-durations-ids-while-keeping-general-content-in-a-clean-sans-font",
+      "title": "Upgrade typography to match the “sharp, minimal, data-centric” direction with high contrast: ensure consistent heading hierarchy, improve numeric/time readability (e.g., timestamps/durations), and apply a deliberate mono treatment where appropriate (timestamps/durations/IDs) while keeping general content in a clean sans font.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refine-the-appshell-header-and-navigation-visuals-to-match-the-neural-midnight-theme-and-ai-native-aesthetic-using-restrained-depth-subtle-separators-and-precise-active-states-electric-indigo-emphasis-keep-the-navigation-usable-on-small-screens-and-avoid-clipped-tabs",
+      "title": "Refine the AppShell header and navigation visuals to match the Neural Midnight theme and ‘AI-native’ aesthetic using restrained depth, subtle separators, and precise active states (Electric Indigo emphasis). Keep the navigation usable on small screens and avoid clipped tabs.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-on-device-deterministic-ai-focus-score-0-100-that-updates-throughout-the-day-based-only-on-recorded-omnitrace-data-no-external-services-the-score-must-be-derived-from-session-duration-frequency-of-distractions-app-screen-switching-speed-using-navigation-context-switch-evidence-and-rest-gaps-idle-background-signals-map-the-score-into-exactly-four-labels-deep-focus-flow-unstable-distracted",
+      "title": "Implement an on-device, deterministic “AI Focus Score” (0–100) that updates throughout the day based only on recorded OMNITRACE data (no external services). The score must be derived from: session duration, frequency of distractions, app/screen switching speed (using navigation/context-switch evidence), and rest gaps (idle/background signals). Map the score into exactly four labels: “Deep Focus”, “Flow”, “Unstable”, “Distracted”.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-top-of-app-focus-score-indicator-ring-ui-that-visually-represents-the-current-focus-score-and-state-the-ring-must-have-a-soft-glow-and-its-color-must-transition-smoothly-over-time-no-abrupt-color-jumps-as-the-score-changes",
+      "title": "Add a top-of-app Focus Score indicator ring UI that visually represents the current Focus Score and state. The ring must have a soft glow and its color must transition smoothly over time (no abrupt color jumps) as the score changes.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-live-timeline-screen-to-support-a-two-mode-toggle-timeline-and-heatmap-in-heatmap-mode-render-a-horizontal-time-bar-for-the-selected-time-window-where-color-intensity-represents-mental-load-derived-deterministically-from-existing-event-fields-e-g-duration-category-confidence-idle-use-a-smooth-gradient-treatment-indigo-cyan-red-and-avoid-discrete-banding",
+      "title": "Extend the Live Timeline screen to support a two-mode toggle: “Timeline” and “Heatmap”. In “Heatmap” mode, render a horizontal time bar for the selected time window where color intensity represents mental load derived deterministically from existing event fields (e.g., duration/category/confidence/idle). Use a smooth gradient treatment (Indigo → Cyan → Red) and avoid discrete banding.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-zoom-interaction-for-the-heatmap-mode-support-pinch-to-zoom-where-available-also-provide-an-explicit-accessible-alternative-control-for-environments-where-pinch-is-unavailable-e-g-a-slider-or-buttons-zoom-must-change-the-time-resolution-detail-of-the-heatmap-without-losing-correctness",
+      "title": "Add zoom interaction for the Heatmap mode. Support pinch-to-zoom where available; also provide an explicit, accessible alternative control for environments where pinch is unavailable (e.g., a slider or +/- buttons). Zoom must change the time resolution/detail of the heatmap without losing correctness.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-smart-auto-merging-as-a-deterministic-local-summarization-layer-that-merges-raw-events-into-higher-level-segments-while-preserving-access-to-raw-logs-include-at-least-these-rule-families-as-deterministic-heuristics-navigation-bursts-grouped-into-an-exploration-session-short-rapid-app-screen-switches-grouped-into-micro-distraction-idle-background-rest-like-gaps-grouped-into-recovery-gap",
+      "title": "Implement Smart Auto-Merging as a deterministic, local summarization layer that merges raw events into higher-level segments while preserving access to raw logs. Include at least these rule families as deterministic heuristics: navigation bursts grouped into an “Exploration Session”; short, rapid app/screen switches grouped into “Micro-Distraction”; idle/background/rest-like gaps grouped into “Recovery Gap”.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-end-of-day-what-happened-today-daily-summary-card-that-generates-calm-deterministic-natural-language-insights-from-the-day-s-recorded-events-segments-no-ai-include-at-least-best-focus-window-s-periods-where-distractions-increased-and-a-simple-rest-focus-correlation-statement-when-supported-by-data-render-as-a-single-glass-style-card-with-no-charts",
+      "title": "Add an end-of-day “What happened today?” daily summary card that generates calm, deterministic natural-language insights from the day’s recorded events/segments (no AI). Include at least: best focus window(s), periods where distractions increased, and a simple rest→focus correlation statement when supported by data. Render as a single glass-style card with no charts.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-silent-micro-gamification-titles-earned-deterministically-from-local-activity-patterns-no-popups-include-at-least-these-titles-flow-architect-focus-breaker-distraction-survivor-titles-must-be-computed-locally-and-displayed-subtly-e-g-in-dashboard-or-a-profile-summary-area-without-interrupting-the-user",
+      "title": "Implement silent micro-gamification titles earned deterministically from local activity patterns (no popups). Include at least these titles: “Flow Architect”, “Focus Breaker”, “Distraction Survivor”. Titles must be computed locally and displayed subtly (e.g., in Dashboard or a profile/summary area) without interrupting the user.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-the-requested-live-timeline-visual-rules-by-extending-the-existing-cognitive-time-flow-styling-1-card-glow-strength-reacts-to-duration-longer-duration-stronger-glow-2-auto-events-render-with-sharper-edges-while-manual-events-render-with-slightly-more-rounded-edges-and-3-timestamp-text-fades-with-age-recent-events-brighter-older-events-dimmer",
+      "title": "Apply the requested Live Timeline visual rules by extending the existing Cognitive Time Flow styling: (1) card glow strength reacts to duration (longer duration => stronger glow), (2) Auto events render with sharper edges while Manual events render with slightly more rounded edges, and (3) timestamp text fades with age (recent events brighter; older events dimmer).",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-one-tap-private-mode-that-when-enabled-blurs-sensitive-timeline-event-content-and-hides-titles-while-keeping-metrics-aggregates-visible-private-mode-must-be-local-only-reversible-and-clearly-indicated-in-the-ui-while-active",
+      "title": "Add a one-tap “Private Mode” that, when enabled, blurs sensitive timeline event content and hides titles while keeping metrics/aggregates visible. Private Mode must be local-only, reversible, and clearly indicated in the UI while active.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-optional-feature-implement-deterministic-cognitive-drift-detection-insights-that-identify-patterns-such-as-focus-decaying-after-an-observed-duration-threshold-or-distractions-clustering-and-surface-a-gentle-non-pushy-english-recommendation-no-alarms-no-push-no-popups",
+      "title": "(Optional feature) Implement deterministic “Cognitive Drift Detection” insights that identify patterns such as focus decaying after an observed duration threshold or distractions clustering, and surface a gentle, non-pushy English recommendation (no alarms, no push, no popups).",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-explicit-in-app-build-identifier-for-the-frontend-set-to-version-6-and-display-it-in-the-ui-so-users-can-confirm-they-are-viewing-the-intended-live-release",
+      "title": "Add an explicit in-app build identifier for the frontend set to \"Version 6\" and display it in the UI so users can confirm they are viewing the intended live release.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-live-app-troubleshooting-panel-in-settings-that-helps-users-when-they-cannot-see-the-newest-live-version-including-showing-the-current-url-and-providing-clear-cache-refresh-guidance-and-a-one-click-reload-action",
+      "title": "Add a \"Live app troubleshooting\" panel in Settings that helps users when they cannot see the newest live version, including showing the current URL and providing clear cache/refresh guidance and a one-click reload action.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expose-a-backend-query-method-that-returns-backend-build-version-info-and-surface-it-in-the-settings-build-info-section-to-help-detect-frontend-backend-mismatch-when-a-user-thinks-an-upgrade-is-not-live",
+      "title": "Expose a backend query method that returns backend build/version info and surface it in the Settings \"Build info\" section to help detect frontend/backend mismatch when a user thinks an upgrade is not live.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-frontend-in-app-build-identifier-to-reflect-the-live-release-as-version-7-single-source-of-truth-frontend-src-constants-buildinfo-ts-and-ensure-it-is-displayed-anywhere-the-build-label-is-surfaced-e-g-settings-build-info",
+      "title": "Update the frontend in-app build identifier to reflect the live release as \"Version 7\" (single source of truth: frontend/src/constants/buildInfo.ts) and ensure it is displayed anywhere the build label is surfaced (e.g., Settings → Build Info).",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-settings-build-info-mismatch-warning-only-appears-when-the-frontend-and-backend-build-labels-genuinely-differ-and-when-they-match-it-does-not-show-a-stale-cached-build-warning",
+      "title": "Ensure the Settings \"Build Info\" mismatch warning only appears when the frontend and backend build labels genuinely differ, and when they match it does not show a stale/cached-build warning.",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-promote-deploy-the-existing-draft-version-8-build-to-the-live-production-environment",
+      "title": "Promote/deploy the existing Draft Version 8 build to the live (production) environment.",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-frontend-build-label-single-source-of-truth-frontend-src-constants-buildinfo-ts-so-the-app-reports-the-live-release-as-version-8-anywhere-the-frontend-build-label-is-displayed-e-g-settings-build-info",
+      "title": "Update the frontend build label single source of truth (frontend/src/constants/buildInfo.ts) so the app reports the live release as \"Version 8\" anywhere the frontend build label is displayed (e.g., Settings → Build Info).",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-settings-build-info-mismatch-warning-does-not-appear-when-the-frontend-and-backend-build-labels-match-for-the-live-version-8-release",
+      "title": "Ensure the Settings → Build Info mismatch warning does not appear when the frontend and backend build labels match for the live Version 8 release.",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-cognitive-modes-control-focus-flow-recovery-analysis-as-a-subtle-pill-switch-located-near-the-existing-focus-score-ring-in-the-appshell-header-using-english-user-facing-labels",
+      "title": "Add a Cognitive Modes control (Focus, Flow, Recovery, Analysis) as a subtle pill switch located near the existing Focus Score ring in the AppShell header, using English user-facing labels.",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-persist-the-selected-cognitive-mode-locally-device-only-so-it-survives-reloads-and-wire-it-into-the-instrumentation-context-so-new-events-capture-the-current-mode-via-the-existing-context-snapshot-mechanism",
+      "title": "Persist the selected Cognitive Mode locally (device-only) so it survives reloads, and wire it into the instrumentation context so new events capture the current mode via the existing context snapshot mechanism.",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-smart-merging-so-it-becomes-mode-aware-and-deterministically-adjusts-merging-behavior-per-selected-mode-without-inventing-any-new-data-ensure-the-live-timeline-smart-merged-view-uses-the-selected-mode-when-producing-merged-segments",
+      "title": "Update Smart Merging so it becomes mode-aware and deterministically adjusts merging behavior per selected mode without inventing any new data; ensure the Live Timeline \"Smart Merged\" view uses the selected mode when producing merged segments.",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-live-timeline-copy-and-micro-ui-to-clearly-reflect-the-selected-cognitive-mode-in-a-low-noise-way-e-g-a-small-label-near-the-merge-mode-selector-or-near-the-timeline-header-using-english-text-and-keeping-the-premium-minimal-feel",
+      "title": "Adjust Live Timeline copy and micro-UI to clearly reflect the selected Cognitive Mode in a low-noise way (e.g., a small label near the merge-mode selector or near the timeline header), using English text and keeping the premium minimal feel.",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-top-level-app-section-called-omnibrain-that-users-can-open-from-the-main-navigation-alongside-existing-sections-timeline-dashboard-activity-map-forensic-search-timer-settings",
+      "title": "Add a new top-level app section called “OMNIBRAIN” that users can open from the main navigation, alongside existing sections (Timeline, Dashboard, Activity Map, Forensic, Search, Timer, Settings).",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-chatgpt-style-omnibrain-chat-ui-on-the-new-screen-with-chat-bubbles-a-typing-animation-for-the-assistant-a-thinking-indicator-english-text-an-input-box-and-inline-suggested-questions-rendered-under-the-input",
+      "title": "Implement a ChatGPT-style OMNIBRAIN chat UI on the new screen with: chat bubbles, a typing animation for the assistant, a “thinking” indicator (English text), an input box, and inline suggested questions rendered under the input.",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-omnibrain-context-memory-side-panel-or-collapsible-drawer-on-small-screens-with-three-selectable-scopes-today-week-and-all-time-the-selected-scope-must-control-what-data-omnibrain-analyzes-when-answering",
+      "title": "Add an OMNIBRAIN “Context Memory” side panel (or collapsible drawer on small screens) with three selectable scopes: “Today”, “Week”, and “All time”. The selected scope must control what data OMNIBRAIN analyzes when answering.",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-deterministic-template-based-omnibrain-answers-derived-only-from-existing-omnitrace-local-data-events-segments-metrics-with-explicit-no-hallucination-behavior-if-data-is-insufficient-omnibrain-must-say-so-and-ask-a-clarifying-question-or-suggest-a-related-query",
+      "title": "Implement deterministic, template-based OMNIBRAIN answers derived only from existing OMNITRACE local data (events/segments/metrics), with explicit “no hallucination” behavior: if data is insufficient, OMNIBRAIN must say so and ask a clarifying question or suggest a related query.",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-intelligence-modes-to-omnibrain-with-exactly-four-user-selectable-modes-explain-analyze-coach-and-silent-these-modes-must-change-response-verbosity-style-deterministically-without-changing-the-underlying-facts",
+      "title": "Add “Intelligence Modes” to OMNIBRAIN with exactly four user-selectable modes: “Explain”, “Analyze”, “Coach”, and “Silent”. These modes must change response verbosity/style deterministically (without changing the underlying facts).",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-define-a-first-set-of-supported-omnibrain-question-intents-and-deterministic-answer-templates-that-leverage-existing-omnitrace-analytics-modules-including-at-minimum-1-why-was-i-distracted-today-2-why-did-my-focus-drop-after-time-3-when-do-i-focus-best-4-am-i-improving-this-week-and-5-what-happened-today",
+      "title": "Define a first set of supported OMNIBRAIN question intents and deterministic answer templates that leverage existing OMNITRACE analytics modules, including at minimum: (1) “Why was I distracted today?”, (2) “Why did my focus drop after <time>?”, (3) “When do I focus best?”, (4) “Am I improving this week?”, and (5) “What happened today?”.",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-persist-omnibrain-chat-history-locally-device-only-so-the-conversation-survives-reloads-and-provide-an-explicit-clear-omnibrain-chat-action-within-the-omnibrain-screen-that-only-clears-chat-history-not-the-full-omnitrace-event-ledger",
+      "title": "Persist OMNIBRAIN chat history locally (device-only) so the conversation survives reloads, and provide an explicit “Clear OMNIBRAIN chat” action within the OMNIBRAIN screen that only clears chat history (not the full OMNITRACE event ledger).",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-instrument-omnibrain-interactions-using-the-existing-in-app-event-logging-approach-log-at-least-an-event-when-the-user-opens-the-omnibrain-screen-and-when-the-user-submits-a-question-capturing-current-screen-mode-context-without-adding-new-backend-dependencies",
+      "title": "Instrument OMNIBRAIN interactions using the existing in-app event logging approach: log at least an event when the user opens the OMNIBRAIN screen and when the user submits a question, capturing current screen/mode context without adding new backend dependencies.",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-re-run-a-clean-build-and-deployment-promotion-to-the-live-production-environment-for-the-existing-version-8-codebase-since-the-previous-attempt-failed-due-to-an-internal-build-deployment-error",
+      "title": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase, since the previous attempt failed due to an internal build/deployment error.",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-after-deployment-verify-that-settings-build-info-reports-matching-build-versions-for-frontend-and-backend-as-version-8-and-that-no-version-mismatch-warning-is-shown-when-the-versions-match",
+      "title": "After deployment, verify that Settings → Build Info reports matching build versions for frontend and backend as \"Version 8\", and that no version-mismatch warning is shown when the versions match.",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Single-file full-stack app shell: UI + logic + local storage in one file, offline-first, WebView compatible, future wrapper-ready (APK/iOS), no runtime external dependencies",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Event log engine: ms-precision timestamped events with type, context (screen/mode/state), and duration when applicable; zero data-loss tolerance",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Automatic in-app interaction tracking: log all user actions inside the app (clicks, navigation, mode changes, edits, settings changes, etc.)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Device-context/session tracking (within OS limits): screen on/off while active, app foreground/background duration, idle vs active time, session boundaries",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Manual event capture: user-created timestamped life/activity events (e.g., studying, distraction, break, important moment) integrated into the timeline",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Time engine: global/session clocks, idle detection, activity durations, overlap resolution, and ability to answer “what was I doing at time X?” queries",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Live Timeline View (core screen): vertical scrollable time ledger showing timestamp, activity, duration, category, and confidence (auto vs manual)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Session Analysis Dashboard: totals for active/passive/idle gaps, context switches, focus density with clean visualizations",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Activity Map screen: breakdown by categories (study/work/distraction/rest/unknown) with subtle color coding",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Forensic Mode: select date/time range and reconstruct an exact recorded timeline with no assumptions",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Search & query system: search by activity/time/duration/category/keyword and anomalies (e.g., long idle); instant search expectation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Deterministic analytics layer (no AI): derive frequent activities, longest focus, interruption sources, time leakage zones, peak hours, behavior patterns",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Privacy & control: local-only by default (no cloud sync/analytics/SDKs), one-tap full wipe, optional export (CSV/JSON)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Performance & resilience: handle months of logs, lag-free timeline scroll, predictable memory use, graceful low-end degradation, and edge cases (app killed, lock, inactivity, overlap, partial recovery)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "UI upgrade: update OMNITRACE theme and color palette (premium dark-luxury styling refinement)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add a separate Stopwatch & Timer section/screen (standalone tools, distinct from timeline)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Neural Midnight UI upgrade + “Cognitive Time Flow”: elite AI-native dark-mode visual system (neural-black + layered surfaces, Electric Indigo/Cyan accents) where timeline entries convey focus intensity/mental state via subtle color shifts, soft glows, elevation depth, and purposeful micro-animations; distinct styling for auto-logged (structured) vs manual (organic) entries; sharp data-centric high-contrast typography",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Focus Score (0–100) + top-of-app indicator ring: compute an always-updating focus/flow/distracted state from recorded session duration, distraction frequency, app switching speed, and rest gaps (must be local + deterministic/heuristic, not AI)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Live Timeline “Mental Heatmap Mode”: add Timeline | Heatmap toggle; heatmap as horizontal time bar with smooth gradient intensity for mental load; support zoom (pinch or equivalent control in WebView)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Smart auto-merging / summarization rules: merge raw events into higher-level segments (e.g., navigation bursts→Exploration Session; short app switches→Micro-Distraction; idle+background→Recovery Gap) while preserving access to raw logs",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "End-of-day “What happened today?” summary card: generate deterministic daily insights (best focus window, distraction increase periods, rest→focus correlations) with calm language and a single glass-style card UI",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Micro-gamification via silent identity titles (e.g., Flow Architect, Focus Breaker, Distraction Survivor) earned with no popups; privacy-first and local-only",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "UI motion/visual rules: card glow scales with duration; auto events use sharper edges and manual slightly rounded; time text fades with age (recent bright, older dim)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Private Mode: one-tap blur/hide sensitive event titles while keeping metrics/aggregates visible; local-only, reversible, with clear indicator",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Cognitive drift detection insights: detect patterns like focus decay after X minutes or clustered distractions and surface gentle, non-pushy recommendations (must be deterministic from logs, not AI)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Update the backend build-info query so that getBuildInfo().version matches the frontend build label for the live release (\"Version 7\"), and update backendTimestamp to the new build timestamp for this release.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "Promote/deploy Draft Version 8 to the live (production) build",
+      "reqIds": [],
+      "status": "in_progress"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Update the backend build info endpoint (backend/main.mo getBuildInfo()) so getBuildInfo().version matches the live frontend build label (\"Version 8\"), and update backendTimestamp to the new build timestamp for this live release.",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Cognitive Modes: one-tap mode switch (Focus/Flow/Recovery/Analysis) that changes deterministic grouping/summarization and what gets emphasized in the timeline; surfaced as a subtle pill near the Focus Score ring",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Time Density Visualization: add a thin vertical density line on the left of the timeline (thickness + gradient reflect deterministically-derived cognitive load/activity intensity) with no charts",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Future Prediction Strip: add a quiet “next likely high-focus window” text strip below the timeline header, computed locally and deterministically from user’s historical patterns (no notifications/alarms)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Session DNA: tag long sessions with deterministic phase labels (e.g., Fast Start / Deep Core / Distracted End) shown as 3 tiny dots/icons on session cards",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Friction Detection insight: deterministically detect fragmented days (many short sessions, rapid task switching, missing recovery gaps) and surface one calm recommendation line (no alarms/push/popups)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Zero-knowledge privacy signal: add a small UI badge stating all intelligence runs locally and no raw activity leaves the device",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-38",
+      "summary": "Memory Layers (optional advanced views): switch timeline/analytics views between Today / Typical Day / Best Day Ever / Burnout Day with appropriate deterministic aggregations",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Micro-polish motion rules: extend timeline + Focus Score ring micro-animations (e.g., old cards gradually lose glow, focus ring slow pulse every 30–60s) while keeping premium minimal feel",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "OMNIBRAIN in-app local intelligence assistant: ChatGPT-style chat UI (bubbles/typing/thinking), contextual memory panel, suggested questions, and deterministic rule/template-based answers derived from OMNITRACE timeline data (no API, no hallucination), with optional future local on-device model (WASM)",
+      "reqIds": [],
+      "status": "in_progress"
+    },
+    {
+      "id": "AR-43",
+      "summary": "Confirm the backend build-info endpoint is deployed and returns the expected Version 8 build info (version and backendTimestamp) on the live backend canister.",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "OMNITRACE",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

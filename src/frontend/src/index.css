@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neural Midnight Color System - OKLCH */
+    --background: 0.08 0.02 260; /* Deep neural black */
+    --foreground: 0.95 0.01 260; /* Near white with cool tint */
+    
+    --card: 0.12 0.03 260; /* Elevated surface */
+    --card-foreground: 0.95 0.01 260;
+    
+    --popover: 0.14 0.03 260; /* Floating elements */
+    --popover-foreground: 0.95 0.01 260;
+    
+    --primary: 0.7 0.2 260; /* Electric Indigo */
+    --primary-foreground: 0.98 0.01 260;
+    
+    --secondary: 0.75 0.18 180; /* Cyan Pulse */
+    --secondary-foreground: 0.1 0.02 260;
+    
+    --muted: 0.2 0.03 260; /* Subtle backgrounds */
+    --muted-foreground: 0.6 0.05 260;
+    
+    --accent: 0.75 0.18 180; /* Cyan Pulse accent */
+    --accent-foreground: 0.1 0.02 260;
+    
+    --destructive: 0.6 0.25 25; /* Warm red */
+    --destructive-foreground: 0.98 0.01 260;
+    
+    --success: 0.7 0.2 145; /* Green */
+    --success-foreground: 0.98 0.01 260;
+    
+    --warning: 0.75 0.2 70; /* Amber */
+    --warning-foreground: 0.1 0.02 260;
+    
+    --border: 0.25 0.04 260; /* Subtle borders */
+    --input: 0.25 0.04 260;
+    --ring: 0.7 0.2 260; /* Focus rings */
+    
+    --radius: 8px;
+    
+    /* Cognitive Time Flow Variables */
+    --cognitive-intensity: 0.5;
+    --cognitive-glow-color: oklch(0.7 0.2 260);
+    --cognitive-glow-strength: 0.5;
+    --cognitive-elevation: 1;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-bold tracking-tight;
+  }
+  
+  code, pre {
+    @apply font-mono;
+  }
+}
+
+/* Cognitive Time Flow Styles */
+@layer components {
+  .timeline-event-card {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 0 calc(20px * var(--cognitive-glow-strength)) calc(5px * var(--cognitive-glow-strength)) var(--cognitive-glow-color),
+      0 calc(2px * var(--cognitive-elevation)) calc(8px * var(--cognitive-elevation)) rgba(0, 0, 0, 0.3);
+  }
+  
+  .timeline-event-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      var(--cognitive-glow-color) 0%,
+      transparent 50%
+    );
+    opacity: calc(0.1 * var(--cognitive-intensity));
+    pointer-events: none;
+  }
+  
+  .timeline-event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 0 calc(30px * var(--cognitive-glow-strength)) calc(8px * var(--cognitive-glow-strength)) var(--cognitive-glow-color),
+      0 calc(4px * var(--cognitive-elevation)) calc(12px * var(--cognitive-elevation)) rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Focus Score Ring Styles */
+@layer components {
+  .focus-ring-container {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .focus-ring-glow {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    filter: blur(20px);
+    opacity: 0.6;
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+  
+  .focus-ring-deep-focus .focus-ring-glow {
+    background: radial-gradient(circle, oklch(0.7 0.2 260) 0%, transparent 70%);
+  }
+  
+  .focus-ring-flow .focus-ring-glow {
+    background: radial-gradient(circle, oklch(0.75 0.18 180) 0%, transparent 70%);
+  }
+  
+  .focus-ring-unstable .focus-ring-glow {
+    background: radial-gradient(circle, oklch(0.75 0.2 70) 0%, transparent 70%);
+  }
+  
+  .focus-ring-distracted .focus-ring-glow {
+    background: radial-gradient(circle, oklch(0.6 0.25 25) 0%, transparent 70%);
+  }
+  
+  .focus-ring-insufficient {
+    opacity: 0.6;
+  }
+  
+  .focus-ring-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .focus-ring-score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+  }
+  
+  .focus-ring-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .focus-ring-badge {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .focus-ring-container,
+    .focus-ring-glow,
+    .timeline-event-card {
+      transition: none;
+      animation: none;
+    }
+  }
+}
+
+/* Heatmap Styles */
+@layer components {
+  .heatmap-container {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: oklch(var(--muted));
+  }
+  
+  .heatmap-canvas {
+    display: block;
+    width: 100%;
+    image-rendering: crisp-edges;
+  }
+  
+  .heatmap-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: oklch(var(--muted));
+    border-radius: var(--radius);
+  }
+}
+
+/* Daily Summary Card Styles */
+@layer components {
+  .daily-summary-card {
+    background: oklch(var(--card) / 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid oklch(var(--border) / 0.5);
+  }
+}
+
+/* Private Mode Blur */
+@layer utilities {
+  .blur-sm {
+    filter: blur(8px);
+    user-select: none;
+  }
+}

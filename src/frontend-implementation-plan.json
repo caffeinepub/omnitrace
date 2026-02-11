@@ -1,0 +1,54 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Version 8 promotion retry and Build Info verification (frontend-only)",
+  "requirements": [
+    {
+      "id": "REQ-64",
+      "summary": "Update frontend-facing promotion verification guidance to support a clean rebuild/promotion retry and confirm live assets are not stale/cached.",
+      "acceptanceCriteria": [
+        "A fresh build/deploy completes successfully without internal build system errors.",
+        "The live (production) URL serves the newly built frontend assets (not a stale/cached version)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/PRODUCTION_PROMOTION.md",
+          "operation": "modify",
+          "description": "Refine the checklist to emphasize a clean rebuild/promotion retry flow, and strengthen live-asset verification steps (including hard refresh / cache-clearing and confirming the live URL). Ensure the doc explicitly references using Settings → Build Info as the primary verification surface for detecting stale frontend assets."
+        },
+        {
+          "path": "frontend/src/screens/SettingsScreen.tsx",
+          "operation": "modify",
+          "description": "Tighten the Live App Troubleshooting guidance to align with the updated promotion checklist (focus on verifying the live URL and cache-busting steps) so users can quickly confirm they are seeing the newly promoted frontend build."
+        }
+      ]
+    },
+    {
+      "id": "REQ-65",
+      "summary": "Ensure Settings → Build Info displays matching Version 8 frontend/backend versions with correct mismatch-warning behavior and resilient error handling.",
+      "acceptanceCriteria": [
+        "In the live app, Settings → Build Info shows Frontend version: \"Version 8\" (from frontend/src/constants/buildInfo.ts).",
+        "In the live app, Settings → Build Info shows Backend version: \"Version 8\" (from backend getBuildInfo()).",
+        "When backend version equals frontend version, the mismatch warning does not appear.",
+        "If the backend build info cannot be loaded, the UI continues to show \"Error loading\" for backend version (existing behavior), and no mismatch warning is shown solely due to that error state."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/SettingsScreen.tsx",
+          "operation": "modify",
+          "description": "Enhance the Build Info card to (1) also display backendTimestamp when backend build info loads successfully, and (2) add a manual refresh control that re-fetches backend build info on demand. Preserve existing behavior of showing \"Error loading\" on failure, and ensure version mismatch warnings only render when backend build info is successfully loaded and versions differ."
+        },
+        {
+          "path": "frontend/src/hooks/useBuildInfo.ts",
+          "operation": "modify",
+          "description": "Adjust the build-info query behavior as needed to support reliable post-promotion verification (e.g., ensure refetch behavior works well with the new manual refresh in Settings, without causing mismatch warnings during error states). Keep user-facing text in English (UI text remains in SettingsScreen)."
+        },
+        {
+          "path": "frontend/src/constants/buildInfo.ts",
+          "operation": "modify",
+          "description": "Confirm the frontend build label constant remains set to \"Version 8\" and is the sole source of truth for the displayed frontend version in Settings → Build Info."
+        }
+      ]
+    }
+  ]
+}
