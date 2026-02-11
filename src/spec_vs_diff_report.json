@@ -1,47 +1,51 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-11T13:27:37.656Z",
-  "summary": "Frontend build-info label is set to \"Version 8\" and Settings → Build Info logic appears updated to compare frontend vs backend versions while suppressing mismatch warnings when the backend is errored/unavailable. However, there is no evidence of any backend change/deployment of getBuildInfo() returning Version 8 + non-empty backendTimestamp, and the build/deploy/promotion itself cannot be confirmed from the diff. Several documentation/meta files were modified that were not explicitly requested.",
+  "generatedAt": "2026-02-11T14:26:05.043Z",
+  "summary": "Implemented a persisted OMNIBRAIN runtime mode hook (localStorage + immediate updates) and wired OMNIBRAIN chat submission to bypass local processing in API mode by returning a deterministic external-AI-unavailable response. Settings and OMNIBRAIN UI were modified to incorporate runtime mode, but some acceptance criteria about visibly marking API mode as unavailable and surfacing the mode label in the OMNIBRAIN header are not fully verifiable from the truncated diffs.",
   "missing_requirements": [
     {
-      "id": "REQ-64",
-      "requirement": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase (no internal build/deployment errors; live URL serves new assets).",
-      "reason": "The diff only shows code/doc changes; it does not include any build system logs, CI/CD changes, or deployment/promotion artifacts that demonstrate a clean successful production promotion or cache-busting/new-asset serving on the live URL.",
+      "id": "REQ-86",
+      "requirement": "Mark the “API (Online)” option as visibly unavailable in Settings (e.g., disabled and/or helper text explaining it is not supported in this build), while keeping the existing offline-only/no-network-calls messaging true.",
+      "reason": "The diff shows a runtime mode hook with an 'apiUnavailableNote' label, and SettingsScreen imports Select + runtime mode hook, but the provided SettingsScreen diff is truncated before the actual runtime mode control rendering, so we cannot confirm the API option is disabled/visibly unavailable or that helper text/messaging is present.",
       "evidence": [
-        "frontend/PRODUCTION_PROMOTION.md"
+        "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts",
+        "frontend/src/screens/SettingsScreen.tsx"
       ]
     },
     {
-      "id": "REQ-66",
-      "requirement": "Confirm the backend build-info endpoint is deployed and returns Version 8 with a non-empty backendTimestamp; frontend can fetch/display it in live.",
-      "reason": "No backend files are shown as modified and there is no evidence in the diff that backend/main.mo getBuildInfo() returns version = \"Version 8\" and a non-empty backendTimestamp, or that the live backend canister was deployed.",
-      "evidence": []
+      "id": "REQ-88",
+      "requirement": "Surface the currently selected runtime mode in the OMNIBRAIN screen UI (e.g., a badge/label near the header), and indicate API mode is unavailable if selected.",
+      "reason": "OmniBrainScreen imports Badge and runtime mode hook and the file header comment mentions a 'runtime mode badge', but the diff is truncated before the header JSX; we cannot verify the badge/label actually renders or that it indicates 'unavailable' when API mode is selected.",
+      "evidence": [
+        "frontend/src/screens/OmniBrainScreen.tsx",
+        "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts"
+      ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added/updated a production promotion checklist document (deployment/cache troubleshooting guide).",
-      "reason": "The BuildRequest focuses on retrying the failed promotion and verifying build info in-app; it does not request adding new documentation files/process docs. This may be helpful, but it is not an explicit requirement.",
+      "description": "Expanded deterministic intent detection to route many external-AI/API-key related queries to a dedicated 'external_ai_unavailable' intent, and introduced/mentioned tappable follow-up suggestions and a public helper for the external-AI-unavailable response.",
+      "reason": "REQ-87 only requires that when runtime mode is 'API (Online)' (unavailable), all questions return the deterministic external-AI-unavailable response; it does not request broad new intent-detection rules for external-AI queries while in local mode, nor specifically mentions 'tappable' follow-up UI as part of this toggle work.",
       "evidence": [
-        "frontend/PRODUCTION_PROMOTION.md"
+        "frontend/src/omni/omnibrain/engine.ts",
+        "frontend/src/screens/OmniBrainScreen.tsx"
       ]
     },
     {
-      "description": "Modified repository meta/summary files not tied to the retry/promotion verification requirements.",
-      "reason": "These files are not referenced by the BuildRequest requirements/AC, and their changes do not directly implement REQ-64/65/66.",
+      "description": "Settings screen enhancements unrelated to the runtime mode toggle (e.g., 'enhanced Build Info card', 'Live App Troubleshooting').",
+      "reason": "BuildRequest scope is limited to adding the runtime mode toggle in/near the existing External AI section and wiring behavior/UI accordingly; additional Settings features are not requested.",
       "evidence": [
-        "frontend-file-summaries.txt",
-        "project_state.json"
+        "frontend/src/screens/SettingsScreen.tsx"
       ]
     }
   ],
-  "confidence": 0.68,
+  "confidence": 0.6,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/PRODUCTION_PROMOTION.md",
-    "frontend/src/constants/buildInfo.ts",
-    "frontend/src/hooks/useBuildInfo.ts",
+    "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts",
+    "frontend/src/omni/omnibrain/engine.ts",
+    "frontend/src/screens/OmniBrainScreen.tsx",
     "frontend/src/screens/SettingsScreen.tsx",
     "project_state.json"
   ]

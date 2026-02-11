@@ -1,52 +1,80 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Version 8 promotion retry and Build Info verification (frontend-only)",
+  "title": "OMNIBRAIN runtime mode toggle (Local vs API-unavailable) with local persistence and UI surfacing",
   "requirements": [
     {
-      "id": "REQ-64",
-      "summary": "Update frontend-facing promotion verification guidance to support a clean rebuild/promotion retry and confirm live assets are not stale/cached.",
+      "id": "REQ-85",
+      "summary": "Create a device-local OMNIBRAIN runtime mode setting (Local vs API) persisted in localStorage with safe defaults and immediate in-app updates.",
       "acceptanceCriteria": [
-        "A fresh build/deploy completes successfully without internal build system errors.",
-        "The live (production) URL serves the newly built frontend assets (not a stale/cached version)."
+        "A new localStorage key is used to store the selected OMNIBRAIN runtime mode.",
+        "Default mode is “Local (Offline)” when no prior selection exists or stored value is invalid.",
+        "Changing the mode updates immediately without requiring a page refresh.",
+        "All user-facing text for the setting is in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/PRODUCTION_PROMOTION.md",
-          "operation": "modify",
-          "description": "Refine the checklist to emphasize a clean rebuild/promotion retry flow, and strengthen live-asset verification steps (including hard refresh / cache-clearing and confirming the live URL). Ensure the doc explicitly references using Settings → Build Info as the primary verification surface for detecting stale frontend assets."
-        },
-        {
-          "path": "frontend/src/screens/SettingsScreen.tsx",
-          "operation": "modify",
-          "description": "Tighten the Live App Troubleshooting guidance to align with the updated promotion checklist (focus on verifying the live URL and cache-busting steps) so users can quickly confirm they are seeing the newly promoted frontend build."
+          "path": "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts",
+          "operation": "create",
+          "description": "Implement a dedicated React hook for OMNIBRAIN runtime mode with: (1) a new localStorage key, (2) strict validation + fallback to “Local (Offline)” on missing/invalid values, and (3) immediate cross-component updates via an in-app event/subscription mechanism (and optionally the browser 'storage' event) so changes propagate without refresh."
         }
       ]
     },
     {
-      "id": "REQ-65",
-      "summary": "Ensure Settings → Build Info displays matching Version 8 frontend/backend versions with correct mismatch-warning behavior and resilient error handling.",
+      "id": "REQ-86",
+      "summary": "Expose the OMNIBRAIN runtime mode toggle inside Settings near the existing External AI (OpenAI) section, with clear English labels and an unavailable/disabled API option explanation.",
       "acceptanceCriteria": [
-        "In the live app, Settings → Build Info shows Frontend version: \"Version 8\" (from frontend/src/constants/buildInfo.ts).",
-        "In the live app, Settings → Build Info shows Backend version: \"Version 8\" (from backend getBuildInfo()).",
-        "When backend version equals frontend version, the mismatch warning does not appear.",
-        "If the backend build info cannot be loaded, the UI continues to show \"Error loading\" for backend version (existing behavior), and no mismatch warning is shown solely due to that error state."
+        "Settings shows a control that allows selecting between “Local (Offline)” and “API (Online)”.",
+        "Because this build does not support external AI network calls, the “API (Online)” option is visibly marked as unavailable (e.g., disabled and/or with helper text explaining it is not supported in this build).",
+        "The existing Settings messaging that “No API keys are accepted, and OMNIBRAIN makes no network calls” remains true after this change."
       ],
       "file_operations": [
         {
           "path": "frontend/src/screens/SettingsScreen.tsx",
           "operation": "modify",
-          "description": "Enhance the Build Info card to (1) also display backendTimestamp when backend build info loads successfully, and (2) add a manual refresh control that re-fetches backend build info on demand. Preserve existing behavior of showing \"Error loading\" on failure, and ensure version mismatch warnings only render when backend build info is successfully loaded and versions differ."
+          "description": "Add an OMNIBRAIN Runtime Mode control within/near the existing “External AI (OpenAI)” card using existing shadcn-ui components (e.g., Select/Badge/text) without modifying any files under frontend/src/components/ui. The control must present “Local (Offline)” and a visibly unavailable “API (Online)” option (disabled and/or clearly labeled as not supported in this build), and include helper text that preserves and reinforces the current offline-only guarantee. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/hooks/useBuildInfo.ts",
+          "path": "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts",
           "operation": "modify",
-          "description": "Adjust the build-info query behavior as needed to support reliable post-promotion verification (e.g., ensure refetch behavior works well with the new manual refresh in Settings, without causing mismatch warnings during error states). Keep user-facing text in English (UI text remains in SettingsScreen)."
+          "description": "Export runtime-mode labels/helpers (English strings) suitable for Settings UI reuse (e.g., display label for current mode, and an 'unavailable' note for API mode) while keeping Local (Offline) as the validated default."
+        }
+      ]
+    },
+    {
+      "id": "REQ-87",
+      "summary": "Respect selected runtime mode in OMNIBRAIN chat: keep current local deterministic behavior for Local mode; return deterministic external-AI-unavailable response for API mode without any network calls.",
+      "acceptanceCriteria": [
+        "When runtime mode is “Local (Offline)”, OMNIBRAIN responses behave exactly as before this change (deterministic local intents + help search + fallback).",
+        "When runtime mode is “API (Online)” (unavailable), submitting any question produces the deterministic external-AI-unavailable response (no network call).",
+        "No new external network requests are introduced in OMNIBRAIN as part of this change."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/omni/omnibrain/engine.ts",
+          "operation": "modify",
+          "description": "Expose a public, deterministic helper for the existing external-AI-unavailable response generation so the UI can force this reply when runtime mode is set to “API (Online)”, without introducing any network behavior."
         },
         {
-          "path": "frontend/src/constants/buildInfo.ts",
+          "path": "frontend/src/screens/OmniBrainScreen.tsx",
           "operation": "modify",
-          "description": "Confirm the frontend build label constant remains set to \"Version 8\" and is the sole source of truth for the displayed frontend version in Settings → Build Info."
+          "description": "Wire chat submit flow to runtime mode: if mode is “Local (Offline)”, keep the current behavior unchanged; if mode is “API (Online)” (unavailable), bypass local intent/data processing and deterministically return the existing external-AI-unavailable response helper (no network calls). Also subscribe to runtime mode changes via the new hook so behavior updates immediately. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-88",
+      "summary": "Show the currently selected OMNIBRAIN runtime mode on the OMNIBRAIN screen as a low-noise English badge/label, including an unavailable indicator for API mode.",
+      "acceptanceCriteria": [
+        "OMNIBRAIN screen shows the current runtime mode label (e.g., “Mode: Local (Offline)” or “Mode: API (Online)”).",
+        "If the user selects “API (Online)”, the UI indicates it is unavailable in this build (consistent with Settings).",
+        "All user-facing text is in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/OmniBrainScreen.tsx",
+          "operation": "modify",
+          "description": "Add a small runtime-mode label/badge near the OMNIBRAIN header that reads “Mode: Local (Offline)” or “Mode: API (Online)” and, when API is selected, clearly indicates “Unavailable in this build” consistent with Settings. Use existing shadcn-ui Badge/text styling without touching frontend/src/components/ui. Verify the component's usage instructions before implementing."
         }
       ]
     }

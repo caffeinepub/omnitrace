@@ -1,8 +1,8 @@
-// Neural Midnight app shell with Focus Score Ring, Private Mode toggle, and Cognitive Mode switch
+// Neural Midnight app shell with Focus Score Ring, Private Mode toggle, Cognitive Mode switch, and OMNIBRAIN navigation
 
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Activity, BarChart3, Search, Map, Microscope, Settings, Timer } from 'lucide-react';
+import { Activity, BarChart3, Search, Map, Microscope, Settings, Timer, Brain } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FocusScoreRing } from './FocusScoreRing';
 import { PrivateModeToggle } from './PrivateModeToggle';
@@ -12,7 +12,7 @@ import { computeFocusScore } from '../analytics/focusScore';
 import { useSmoothedFocusPresentation } from '../hooks/useSmoothedFocusPresentation';
 import { usePrivateMode } from '../privacy/privateMode';
 import { useCognitiveMode } from '../hooks/useCognitiveMode';
-import { setCurrentMode } from '../instrumentation/context';
+import { setCurrentMode, setCurrentScreen } from '../instrumentation/context';
 
 interface AppShellProps {
   currentScreen: string;
@@ -35,6 +35,11 @@ export function AppShell({ currentScreen, onScreenChange, children }: AppShellPr
   React.useEffect(() => {
     setCurrentMode(mode);
   }, [mode]);
+
+  // Update instrumentation context when screen changes
+  React.useEffect(() => {
+    setCurrentScreen(currentScreen);
+  }, [currentScreen]);
 
   // Clone children with isPrivate prop
   const childrenWithProps = React.Children.map(children, child => {
@@ -110,6 +115,13 @@ export function AppShell({ currentScreen, onScreenChange, children }: AppShellPr
                 >
                   <Search className="w-4 h-4" />
                   <span className="hidden sm:inline">Search</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="omnibrain" 
+                  className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-b-none px-5 font-semibold transition-all"
+                >
+                  <Brain className="w-4 h-4" />
+                  <span className="hidden sm:inline">OMNIBRAIN</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="timer" 

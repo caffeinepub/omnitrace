@@ -1,15 +1,17 @@
-// Privacy & Control settings with enhanced build info verification, manual refresh, backend timestamp display, and refined troubleshooting guidance
+// Privacy & Control settings with enhanced Build Info card, Live App Troubleshooting, OMNIBRAIN Runtime Mode toggle, External AI (OpenAI) unavailability notice card, and data export/wipe controls
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { exportToJSON, exportToCSV } from '../omni/privacy/export';
 import { wipeAllData } from '../omni/privacy/wipe';
-import { Download, Trash2, Shield, FileJson, FileSpreadsheet, Info, RefreshCw, AlertTriangle, Code } from 'lucide-react';
+import { Download, Trash2, Shield, FileJson, FileSpreadsheet, Info, RefreshCw, AlertTriangle, Code, Zap, Settings2 } from 'lucide-react';
 import { FRONTEND_BUILD_LABEL } from '../constants/buildInfo';
 import { useBuildInfo } from '../hooks/useBuildInfo';
+import { useOmniBrainRuntimeMode, RUNTIME_MODE_LABELS, OmniBrainRuntimeMode } from '../omni/hooks/useOmniBrainRuntimeMode';
 
 export function SettingsScreen() {
   const [isExportingJSON, setIsExportingJSON] = useState(false);
@@ -17,6 +19,7 @@ export function SettingsScreen() {
   const [isWiping, setIsWiping] = useState(false);
 
   const { data: backendBuildInfo, isLoading: backendLoading, isError: backendError, refetch: refetchBuildInfo, isFetching: backendRefetching } = useBuildInfo();
+  const { mode: runtimeMode, setMode: setRuntimeMode, displayLabel: runtimeModeLabel } = useOmniBrainRuntimeMode();
 
   const handleExportJSON = async () => {
     setIsExportingJSON(true);
@@ -165,6 +168,97 @@ export function SettingsScreen() {
             <RefreshCw className="w-4 h-4" />
             Reload App
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-sm border-muted">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Settings2 className="w-5 h-5 text-muted-foreground" />
+            OMNIBRAIN Runtime Mode
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Choose how OMNIBRAIN processes your questions. This setting is stored locally on your device and updates immediately.
+          </p>
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Current mode:</span>
+              <Select 
+                value={runtimeMode} 
+                onValueChange={(v) => setRuntimeMode(v as OmniBrainRuntimeMode)}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="local">{RUNTIME_MODE_LABELS.local}</SelectItem>
+                  <SelectItem value="api" disabled>
+                    {RUNTIME_MODE_LABELS.api}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+              <div className="flex items-start gap-2">
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm font-medium">{RUNTIME_MODE_LABELS.local}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Uses your local OMNITRACE data and static knowledge base. All processing happens on your device. No network calls.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-2 opacity-60">
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">{RUNTIME_MODE_LABELS.api}</p>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+                      {RUNTIME_MODE_LABELS.apiUnavailableNote}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Would connect to external AI services. Not available in this build.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              The current build maintains the offline-only guarantee: No API keys are accepted, and OMNIBRAIN makes no network calls regardless of the selected mode.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-sm border-muted">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Zap className="w-5 h-5 text-muted-foreground" />
+            External AI (OpenAI)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            This build does not support connecting to OpenAI or other external AI services. No API keys are accepted, and OMNIBRAIN makes no network calls.
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            OMNIBRAIN answers questions using only your local OMNITRACE data and a static app help knowledge base. All responses are generated deterministically on your device.
+          </p>
+          <div className="pt-2">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="font-medium">Status:</span>
+              <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+                Unavailable
+              </span>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

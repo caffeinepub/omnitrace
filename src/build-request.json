@@ -1,87 +1,109 @@
 {
   "kind": "build_request",
-  "title": "Retry build + promote Version 8 to live with build-info verification",
-  "priority": "high",
+  "title": "Add Settings toggle to switch OMNIBRAIN between Local and API modes (API currently unavailable)",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-64",
-      "text": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase, since the previous attempt failed due to an internal build/deployment error.",
-      "target": "unknown",
+      "id": "REQ-85",
+      "text": "Add a device-local setting that lets the user choose an OMNIBRAIN runtime mode with two options: “Local (Offline)” and “API (Online)”. Persist the selection in localStorage so it survives reloads.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3",
-          "msg-4",
-          "msg-5",
-          "msg-6"
+          "msg-1"
         ],
         "quotes": [
-          "🙏 Unable to complete deployment",
-          "Deployment error",
-          "❗ Internal AI error encountered. Sorry about that!",
-          "Looks like the build ran into an internal error — want me to try running it again now?",
-          "Yeah"
+          "Want to add a toggle in Settings so you can switch between local and API modes easily?",
+          "Yes"
         ]
       },
       "acceptanceCriteria": [
-        "A fresh build/deploy completes successfully without internal build system errors.",
-        "The live (production) URL serves the newly built frontend assets (not a stale/cached version)."
+        "A new localStorage key is used to store the selected OMNIBRAIN runtime mode.",
+        "Default mode is “Local (Offline)” when no prior selection exists or stored value is invalid.",
+        "Changing the mode updates immediately without requiring a page refresh.",
+        "All user-facing text for the setting is in English."
       ]
     },
     {
-      "id": "REQ-65",
-      "text": "After deployment, verify that Settings → Build Info reports matching build versions for frontend and backend as \"Version 8\", and that no version-mismatch warning is shown when the versions match.",
-      "target": "both",
+      "id": "REQ-86",
+      "text": "Expose the OMNIBRAIN runtime mode toggle in Settings (within or near the existing “External AI (OpenAI)” section), using clear English labels and helper text that sets expectations for the current build.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-6"
+          "msg-1"
         ],
         "quotes": [
-          "🙏 Unable to complete deployment",
-          "Yeah"
+          "Want to add a toggle in Settings so you can switch between local and API modes easily?",
+          "Yes"
         ]
       },
       "acceptanceCriteria": [
-        "In the live app, Settings → Build Info shows Frontend version: \"Version 8\" (from frontend/src/constants/buildInfo.ts).",
-        "In the live app, Settings → Build Info shows Backend version: \"Version 8\" (from backend getBuildInfo()).",
-        "When backend version equals frontend version, the mismatch warning does not appear.",
-        "If the backend build info cannot be loaded, the UI continues to show \"Error loading\" for backend version (existing behavior), and no mismatch warning is shown solely due to that error state."
+        "Settings shows a control that allows selecting between “Local (Offline)” and “API (Online)”.",
+        "Because this build does not support external AI network calls, the “API (Online)” option is visibly marked as unavailable (e.g., disabled and/or with helper text explaining it is not supported in this build).",
+        "The existing Settings messaging that “No API keys are accepted, and OMNIBRAIN makes no network calls” remains true after this change."
       ]
     },
     {
-      "id": "REQ-66",
-      "text": "Confirm the backend build-info endpoint is deployed and returns the expected Version 8 build info (version and backendTimestamp) on the live backend canister.",
-      "target": "backend",
+      "id": "REQ-87",
+      "text": "Wire OMNIBRAIN chat behavior to the selected runtime mode: in “Local (Offline)”, keep current deterministic local-data + knowledge-base responses; in “API (Online)” (unavailable), OMNIBRAIN must respond deterministically with the existing external-AI-unavailable explanation (and suggested follow-ups) rather than attempting any network call.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-6"
+          "msg-1"
         ],
         "quotes": [
-          "🙏 Unable to complete deployment",
-          "Yeah"
+          "…wired up—ready for you to test the OpenAI fallback.",
+          "…toggle in Settings so you can switch between local and API modes easily?",
+          "Yes"
         ]
       },
       "acceptanceCriteria": [
-        "Calling backend getBuildInfo() on the live deployment returns version = \"Version 8\".",
-        "Calling backend getBuildInfo() on the live deployment returns a non-empty backendTimestamp string.",
-        "The frontend Settings → Build Info screen can successfully fetch and display the backend build info in the live environment."
+        "When runtime mode is “Local (Offline)”, OMNIBRAIN responses behave exactly as before this change (deterministic local intents + help search + fallback).",
+        "When runtime mode is “API (Online)” (unavailable), submitting any question produces the deterministic external-AI-unavailable response (no network call).",
+        "No new external network requests are introduced in OMNIBRAIN as part of this change."
+      ]
+    },
+    {
+      "id": "REQ-88",
+      "text": "Surface the currently selected OMNIBRAIN runtime mode in the OMNIBRAIN screen UI in a low-noise way (e.g., a small badge/label near the header), using English text.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "…toggle in Settings so you can switch between local and API modes easily?",
+          "Yes"
+        ]
+      },
+      "acceptanceCriteria": [
+        "OMNIBRAIN screen shows the current runtime mode label (e.g., “Mode: Local (Offline)” or “Mode: API (Online)”).",
+        "If the user selects “API (Online)”, the UI indicates it is unavailable in this build (consistent with Settings).",
+        "All user-facing text is in English."
       ]
     }
   ],
   "constraints": [
-    "Respect the single-actor backend architecture (all Motoko logic remains in backend/main.mo).",
-    "Do not edit files in frontend immutablePaths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Use English for any user-facing text."
+    "Do not add any real OpenAI/Anthropic/LLM API integration or network calls; the current build must remain offline-only.",
+    "Do not modify files under frontend/src/components/ui (read-only shadcn components).",
+    "Keep the backend as-is; no new backend endpoints or schema changes are required for this toggle."
   ],
   "nonGoals": [
-    "Do not add new application features unrelated to retrying the failed build/deployment.",
-    "Do not change the OMNITRACE data model, analytics logic, or UI theme as part of this retry unless required to resolve the build/deploy failure.",
-    "Do not introduce new external services or dependencies."
+    "Accepting/storing user-provided API keys.",
+    "Implementing real external AI responses.",
+    "Changing existing OMNIBRAIN deterministic intent detection or analytics facts beyond what is necessary to respect the selected runtime mode."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

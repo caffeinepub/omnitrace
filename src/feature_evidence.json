@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-re-run-a-clean-build-and-deployment-promotion-to-the-live-production-environment-for-the-existing-version-8-codebase-since-the-previous-attempt-failed-due-to-an-internal-build-deployment-error",
-      "featureTitle": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase, since the previous attempt failed due to an internal build/deployment error.",
+      "featureId": "feature-add-a-device-local-setting-that-lets-the-user-choose-an-omnibrain-runtime-mode-with-two-options-local-offline-and-api-online-persist-the-selection-in-localstorage-so-it-survives-reloads",
+      "featureTitle": "Add a device-local setting that lets the user choose an OMNIBRAIN runtime mode with two options: “Local (Offline)” and “API (Online)”. Persist the selection in localStorage so it survives reloads.",
       "files": [
-        "frontend/PRODUCTION_PROMOTION.md",
-        "frontend/src/screens/SettingsScreen.tsx"
+        "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,16 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-64"
+        "REQ-85"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-after-deployment-verify-that-settings-build-info-reports-matching-build-versions-for-frontend-and-backend-as-version-8-and-that-no-version-mismatch-warning-is-shown-when-the-versions-match",
-      "featureTitle": "After deployment, verify that Settings → Build Info reports matching build versions for frontend and backend as \"Version 8\", and that no version-mismatch warning is shown when the versions match.",
+      "featureId": "feature-expose-the-omnibrain-runtime-mode-toggle-in-settings-within-or-near-the-existing-external-ai-openai-section-using-clear-english-labels-and-helper-text-that-sets-expectations-for-the-current-build",
+      "featureTitle": "Expose the OMNIBRAIN runtime mode toggle in Settings (within or near the existing “External AI (OpenAI)” section), using clear English labels and helper text that sets expectations for the current build.",
       "files": [
-        "frontend/src/constants/buildInfo.ts",
-        "frontend/src/hooks/useBuildInfo.ts",
+        "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts",
         "frontend/src/screens/SettingsScreen.tsx"
       ],
       "components": [
@@ -40,7 +38,48 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-65"
+        "REQ-86"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-wire-omnibrain-chat-behavior-to-the-selected-runtime-mode-in-local-offline-keep-current-deterministic-local-data-knowledge-base-responses-in-api-online-unavailable-omnibrain-must-respond-deterministically-with-the-existing-external-ai-unavailable-explanation-and-suggested-follow-ups-rather-than-attempting-any-network-call",
+      "featureTitle": "Wire OMNIBRAIN chat behavior to the selected runtime mode: in “Local (Offline)”, keep current deterministic local-data + knowledge-base responses; in “API (Online)” (unavailable), OMNIBRAIN must respond deterministically with the existing external-AI-unavailable explanation (and suggested follow-ups) rather than attempting any network call.",
+      "files": [
+        "frontend/src/omni/omnibrain/engine.ts",
+        "frontend/src/screens/OmniBrainScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-87"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-surface-the-currently-selected-omnibrain-runtime-mode-in-the-omnibrain-screen-ui-in-a-low-noise-way-e-g-a-small-badge-label-near-the-header-using-english-text",
+      "featureTitle": "Surface the currently selected OMNIBRAIN runtime mode in the OMNIBRAIN screen UI in a low-noise way (e.g., a small badge/label near the header), using English text.",
+      "files": [
+        "frontend/src/screens/OmniBrainScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-88"
       ],
       "confidence": "high"
     }

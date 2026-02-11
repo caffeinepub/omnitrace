@@ -1,49 +1,62 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-11T13:27:37.660Z",
+  "generatedAt": "2026-02-11T14:26:05.049Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-64",
-        "summary": "Re-run a clean build and deployment/promotion to the live (production) environment for the existing Version 8 codebase, since the previous attempt failed due to an internal build/deployment error.",
+        "id": "REQ-85",
+        "summary": "Add a device-local setting that lets the user choose an OMNIBRAIN runtime mode with two options: “Local (Offline)” and “API (Online)”. Persist the selection in localStorage so it survives reloads.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/PRODUCTION_PROMOTION.md",
-          "frontend/src/screens/SettingsScreen.tsx"
+          "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts"
         ],
         "matchedFiles": [
-          "frontend/PRODUCTION_PROMOTION.md",
-          "frontend/src/screens/SettingsScreen.tsx"
+          "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts"
         ]
       },
       {
-        "id": "REQ-65",
-        "summary": "After deployment, verify that Settings → Build Info reports matching build versions for frontend and backend as \"Version 8\", and that no version-mismatch warning is shown when the versions match.",
+        "id": "REQ-86",
+        "summary": "Expose the OMNIBRAIN runtime mode toggle in Settings (within or near the existing “External AI (OpenAI)” section), using clear English labels and helper text that sets expectations for the current build.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/screens/SettingsScreen.tsx",
-          "frontend/src/hooks/useBuildInfo.ts",
-          "frontend/src/constants/buildInfo.ts"
+          "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts"
         ],
         "matchedFiles": [
           "frontend/src/screens/SettingsScreen.tsx",
-          "frontend/src/hooks/useBuildInfo.ts",
-          "frontend/src/constants/buildInfo.ts"
+          "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts"
         ]
       },
       {
-        "id": "REQ-66",
-        "summary": "Confirm the backend build-info endpoint is deployed and returns the expected Version 8 build info (version and backendTimestamp) on the live backend canister.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "id": "REQ-87",
+        "summary": "Wire OMNIBRAIN chat behavior to the selected runtime mode: in “Local (Offline)”, keep current deterministic local-data + knowledge-base responses; in “API (Online)” (unavailable), OMNIBRAIN must respond deterministically with the existing external-AI-unavailable explanation (and suggested follow-ups) rather than attempting any network call.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/omni/omnibrain/engine.ts",
+          "frontend/src/screens/OmniBrainScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/omni/omnibrain/engine.ts",
+          "frontend/src/screens/OmniBrainScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-88",
+        "summary": "Surface the currently selected OMNIBRAIN runtime mode in the OMNIBRAIN screen UI in a low-noise way (e.g., a small badge/label near the header), using English text.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/OmniBrainScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/OmniBrainScreen.tsx"
+        ]
       }
     ]
   },
@@ -52,9 +65,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/PRODUCTION_PROMOTION.md",
-    "frontend/src/constants/buildInfo.ts",
-    "frontend/src/hooks/useBuildInfo.ts",
+    "frontend/src/omni/hooks/useOmniBrainRuntimeMode.ts",
+    "frontend/src/omni/omnibrain/engine.ts",
+    "frontend/src/screens/OmniBrainScreen.tsx",
     "frontend/src/screens/SettingsScreen.tsx",
     "project_state.json",
     "scratch/component-selection.json",

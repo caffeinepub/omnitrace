@@ -1,4 +1,4 @@
-// Main app component with startup error handling and recovery UI
+// Main app component with startup error handling, recovery UI, and OMNIBRAIN screen routing
 
 import React, { useEffect, useState } from 'react';
 import { AppShell } from './omni/ui/AppShell';
@@ -9,6 +9,7 @@ import { ForensicScreen } from './screens/ForensicScreen';
 import { SearchScreen } from './screens/SearchScreen';
 import { StopwatchTimerScreen } from './screens/StopwatchTimerScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { OmniBrainScreen } from './screens/OmniBrainScreen';
 import { initializeSession } from './omni/session/startup';
 import { LoadingState, StartupErrorState } from './omni/ui/States';
 import { wipeAllDataForRecovery } from './omni/privacy/wipe';
@@ -90,6 +91,8 @@ function App() {
         return <ForensicScreen />;
       case 'search':
         return <SearchScreen />;
+      case 'omnibrain':
+        return <OmniBrainScreen />;
       case 'timer':
         return <StopwatchTimerScreen />;
       case 'settings':

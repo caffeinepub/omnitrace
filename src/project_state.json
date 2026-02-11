@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
+  "projectStateVersion": 35,
   "summary": "OMNITRACE: a single-file, offline-first, full-stack personal activity intelligence system (personal black box) that records and visualizes all meaningful in-app and allowable device-context interactions as a precise, searchable time-based timeline, with deterministic analytics, premium minimal UI, and strict local-privacy controls.",
   "architectural_notes": [
     "Hard constraint: must be a full-stack app contained in a single file (UI + logic + storage), offline-first, with no runtime external dependencies; WebView compatible and wrapper-ready.",
@@ -19,7 +19,7 @@
     "User reports Version 6 is not going live / not visible as live build (potential deployment/publish or URL/cache issue).",
     "Build/deploy attempt failed due to an internal error during the build process (deployment not completed)."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-the-omnitrace-core-data-model-and-local-persistence-layer-for-time-indexed-activity-logs-including-event-logs-ms-precision-session-records-duration-aggregates-metadata-and-user-annotations-ensure-data-is-stored-locally-by-default-with-zero-data-loss-safeguards-atomic-writes-crash-safe-append-commit-strategy-schema-versioning",
@@ -524,6 +524,182 @@
         "REQ-65"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-new-top-level-app-section-called-omnibrain-that-is-accessible-from-the-main-navigation-and-renders-an-assistant-screen-when-selected",
+      "title": "Add a new top-level app section called \"OMNIBRAIN\" that is accessible from the main navigation and renders an assistant screen when selected.",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-chat-style-assistant-ui-on-the-omnibrain-screen-with-chat-bubbles-an-assistant-typing-thinking-indicator-an-input-box-to-submit-a-question-and-inline-suggested-questions-rendered-under-the-input",
+      "title": "Implement a chat-style assistant UI on the OMNIBRAIN screen with chat bubbles, an assistant typing/thinking indicator, an input box to submit a question, and inline suggested questions rendered under the input.",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-omnibrain-context-memory-side-panel-or-collapsible-drawer-on-small-screens-with-selectable-scopes-today-week-and-all-time-the-selected-scope-must-control-what-local-omnitrace-data-omnibrain-uses-when-answering",
+      "title": "Add an OMNIBRAIN \"Context Memory\" side panel (or collapsible drawer on small screens) with selectable scopes: \"Today\", \"Week\", and \"All time\"; the selected scope must control what local OMNITRACE data OMNIBRAIN uses when answering.",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-omnibrain-answers-deterministically-and-template-based-using-only-existing-local-omnitrace-data-events-segments-metrics-with-explicit-no-hallucination-behavior-when-data-is-insufficient",
+      "title": "Generate OMNIBRAIN answers deterministically and template-based using only existing local OMNITRACE data (events/segments/metrics), with explicit no-hallucination behavior when data is insufficient.",
+      "reqIds": [
+        "REQ-70"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-intelligence-modes-to-omnibrain-with-exactly-four-selectable-modes-explain-analyze-coach-and-silent-these-modes-must-deterministically-change-response-verbosity-style-without-changing-the-underlying-facts",
+      "title": "Add \"Intelligence Modes\" to OMNIBRAIN with exactly four selectable modes: \"Explain\", \"Analyze\", \"Coach\", and \"Silent\"; these modes must deterministically change response verbosity/style without changing the underlying facts.",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-persist-omnibrain-chat-history-locally-device-only-so-the-conversation-survives-reloads-and-provide-a-clear-clear-omnibrain-chat-action-that-only-clears-the-chat-history-not-the-omnitrace-event-ledger",
+      "title": "Persist OMNIBRAIN chat history locally (device-only) so the conversation survives reloads, and provide a clear \"Clear OMNIBRAIN chat\" action that only clears the chat history (not the OMNITRACE event ledger).",
+      "reqIds": [
+        "REQ-72"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-instrument-omnibrain-interactions-using-the-existing-in-app-event-logging-approach-log-at-least-1-when-the-user-opens-the-omnibrain-screen-and-2-when-the-user-submits-a-question-capturing-current-screen-mode-context-via-the-existing-context-snapshot-mechanism",
+      "title": "Instrument OMNIBRAIN interactions using the existing in-app event logging approach: log at least (1) when the user opens the OMNIBRAIN screen and (2) when the user submits a question, capturing current screen/mode context via the existing context snapshot mechanism.",
+      "reqIds": [
+        "REQ-73"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-omnibrain-so-that-for-any-user-question-it-always-returns-a-helpful-reply-fully-offline-if-the-question-matches-a-supported-activity-data-intent-answer-using-local-omnitrace-data-otherwise-return-a-deterministic-fallback-response-that-a-clearly-states-it-cannot-infer-facts-not-present-in-the-user-s-local-data-b-asks-a-clarifying-question-and-c-offers-several-relevant-next-questions-the-user-can-tap-to-continue",
+      "title": "Extend OMNIBRAIN so that for any user question it always returns a helpful reply fully offline: if the question matches a supported activity-data intent, answer using local OMNITRACE data; otherwise return a deterministic fallback response that (a) clearly states it cannot infer facts not present in the user’s local data, (b) asks a clarifying question, and (c) offers several relevant next questions the user can tap to continue.",
+      "reqIds": [
+        "REQ-74"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-offline-deterministic-omnibrain-knowledge-base-faq-help-for-app-usage-questions-e-g-what-is-private-mode-how-to-export-wipe-data-what-are-context-memory-scopes-what-do-intelligence-modes-do-how-smart-merging-works-at-a-high-level-when-a-question-is-not-an-activity-data-intent-omnibrain-must-attempt-to-retrieve-the-most-relevant-knowledge-base-entries-by-keyword-matching-and-answer-using-that-content-while-clearly-distinguishing-app-help-static-from-your-data-computed",
+      "title": "Add an offline, deterministic OMNIBRAIN knowledge base (FAQ/help) for app-usage questions (e.g., what is Private Mode, how to export/wipe data, what are Context Memory scopes, what do Intelligence Modes do, how Smart Merging works at a high level). When a question is not an activity-data intent, OMNIBRAIN must attempt to retrieve the most relevant knowledge-base entries by keyword matching and answer using that content, while clearly distinguishing “App help (static)” from “Your data (computed)”.",
+      "reqIds": [
+        "REQ-75"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-broaden-omnibrain-intent-detection-and-templates-to-cover-more-activity-data-questions-using-existing-local-analytics-modules-without-inventing-new-data-fields-add-additional-supported-intents-for-at-least-longest-focus-session-main-distractions-and-most-productive-time-matching-existing-suggested-questions",
+      "title": "Broaden OMNIBRAIN intent detection and templates to cover more activity-data questions using existing local analytics modules, without inventing new data fields. Add additional supported intents for at least: longest focus session, main distractions, and most productive time (matching existing suggested questions).",
+      "reqIds": [
+        "REQ-76"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-increase-the-amount-of-information-omnibrain-provides-in-a-controlled-deterministic-way-by-enhancing-the-analyze-mode-output-to-include-a-richer-fact-list-more-bullet-points-more-computed-details-for-every-supported-intent-while-keeping-explain-concise-coach-gentle-and-silent-one-line",
+      "title": "Increase the amount of information OMNIBRAIN provides in a controlled, deterministic way by enhancing the ‘Analyze’ mode output to include a richer fact list (more bullet points / more computed details) for every supported intent, while keeping ‘Explain’ concise, ‘Coach’ gentle, and ‘Silent’ one-line.",
+      "reqIds": [
+        "REQ-77"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-omnibrain-user-facing-microcopy-to-set-correct-expectations-that-it-can-answer-both-1-questions-about-the-user-s-activity-data-and-2-questions-about-how-the-omnitrace-app-works-all-offline-and-that-it-will-ask-clarifying-questions-when-needed",
+      "title": "Update OMNIBRAIN user-facing microcopy to set correct expectations that it can answer both (1) questions about the user’s activity data and (2) questions about how the OMNITRACE app works, all offline, and that it will ask clarifying questions when needed.",
+      "reqIds": [
+        "REQ-78"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-omnibrain-intent-detection-so-questions-about-external-ai-chatbots-api-keys-are-treated-as-app-help-queries-not-activity-data-queries-and-return-a-deterministic-help-answer-explaining-that-this-build-does-not-support-connecting-to-external-ai-services-via-api-keys",
+      "title": "Update OMNIBRAIN intent detection so questions about external AI/chatbots/API keys are treated as app-help queries (not activity-data queries), and return a deterministic help answer explaining that this build does not support connecting to external AI services via API keys.",
+      "reqIds": [
+        "REQ-79"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-omnibrain-local-knowledge-base-with-a-new-entry-covering-external-ai-api-key-chatbot-requests-including-guidance-that-omnibrain-works-offline-and-does-not-require-or-accept-an-ai-api-key-in-this-app-build",
+      "title": "Extend the OMNIBRAIN local knowledge base with a new entry covering external AI/API key chatbot requests, including guidance that OMNIBRAIN works offline and does not require (or accept) an AI API key in this app build.",
+      "reqIds": [
+        "REQ-80"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-omnibrain-screen-microcopy-header-empty-state-to-reduce-confusion-by-explicitly-stating-that-omnibrain-does-not-use-external-ai-or-api-keys-and-runs-offline-using-local-data-and-app-help",
+      "title": "Adjust OMNIBRAIN screen microcopy (header/empty state) to reduce confusion by explicitly stating that OMNIBRAIN does not use external AI or API keys and runs offline using local data and app help.",
+      "reqIds": [
+        "REQ-81"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-settings-section-labeled-external-ai-openai-that-clearly-communicates-openai-api-key-connections-are-not-supported-in-this-build-and-that-omnibrain-remains-offline-only",
+      "title": "Add a new Settings section labeled \"External AI (OpenAI)\" that clearly communicates OpenAI/API-key connections are not supported in this build and that OMNIBRAIN remains offline-only.",
+      "reqIds": [
+        "REQ-82"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-the-user-asks-omnibrain-to-connect-to-openai-or-use-an-api-key-ensure-the-response-deterministically-explains-that-openai-integration-is-not-available-and-offers-relevant-next-questions-local-data-intents-and-or-app-help-topics",
+      "title": "When the user asks OMNIBRAIN to connect to OpenAI or use an API key, ensure the response deterministically explains that OpenAI integration is not available and offers relevant next questions (local-data intents and/or app-help topics).",
+      "reqIds": [
+        "REQ-83"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-omnibrain-screen-microcopy-header-and-empty-state-helper-text-to-include-a-brief-explicit-mention-of-openai-to-reduce-confusion-when-users-request-openai-connectivity",
+      "title": "Update OMNIBRAIN screen microcopy (header and empty-state helper text) to include a brief explicit mention of \"OpenAI\" to reduce confusion when users request OpenAI connectivity.",
+      "reqIds": [
+        "REQ-84"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-device-local-setting-that-lets-the-user-choose-an-omnibrain-runtime-mode-with-two-options-local-offline-and-api-online-persist-the-selection-in-localstorage-so-it-survives-reloads",
+      "title": "Add a device-local setting that lets the user choose an OMNIBRAIN runtime mode with two options: “Local (Offline)” and “API (Online)”. Persist the selection in localStorage so it survives reloads.",
+      "reqIds": [
+        "REQ-85"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expose-the-omnibrain-runtime-mode-toggle-in-settings-within-or-near-the-existing-external-ai-openai-section-using-clear-english-labels-and-helper-text-that-sets-expectations-for-the-current-build",
+      "title": "Expose the OMNIBRAIN runtime mode toggle in Settings (within or near the existing “External AI (OpenAI)” section), using clear English labels and helper text that sets expectations for the current build.",
+      "reqIds": [
+        "REQ-86"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-omnibrain-chat-behavior-to-the-selected-runtime-mode-in-local-offline-keep-current-deterministic-local-data-knowledge-base-responses-in-api-online-unavailable-omnibrain-must-respond-deterministically-with-the-existing-external-ai-unavailable-explanation-and-suggested-follow-ups-rather-than-attempting-any-network-call",
+      "title": "Wire OMNIBRAIN chat behavior to the selected runtime mode: in “Local (Offline)”, keep current deterministic local-data + knowledge-base responses; in “API (Online)” (unavailable), OMNIBRAIN must respond deterministically with the existing external-AI-unavailable explanation (and suggested follow-ups) rather than attempting any network call.",
+      "reqIds": [
+        "REQ-87"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-surface-the-currently-selected-omnibrain-runtime-mode-in-the-omnibrain-screen-ui-in-a-low-noise-way-e-g-a-small-badge-label-near-the-header-using-english-text",
+      "title": "Surface the currently selected OMNIBRAIN runtime mode in the OMNIBRAIN screen UI in a low-noise way (e.g., a small badge/label near the header), using English text.",
+      "reqIds": [
+        "REQ-88"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -759,6 +935,36 @@
       "reqIds": [
         "REQ-66"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-44",
+      "summary": "Add an in-app AI assistant experience (chat-style assistant) for OMNITRACE",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-45",
+      "summary": "Extend OMNIBRAIN to respond to any user question with a graceful deterministic fallback: broaden supported intents and add an offline local knowledge base/FAQ + retrieval so users always get a reply (no API, no hallucination; clearly distinguish app-data insights vs static knowledge).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-46",
+      "summary": "Optional: Allow configuring an external AI chatbot via user-provided API key (bring-your-own-key) for OMNIBRAIN, while keeping local/offline deterministic behavior as default/fallback",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-47",
+      "summary": "Add optional OpenAI API integration for OMNIBRAIN (bring-your-own-key): allow user to enter an OpenAI API key in Settings and use OpenAI only selectively (not for all queries), e.g., as an online fallback when local deterministic intents/knowledge-base cannot answer; keep local/offline behavior as default.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-48",
+      "summary": "Add a Settings toggle to switch OMNIBRAIN between Local (offline deterministic) mode and OpenAI API (online) mode (when API integration is enabled)",
+      "reqIds": [],
       "status": "pending"
     }
   ],
